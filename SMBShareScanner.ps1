@@ -75,7 +75,7 @@ function Get-ShareInfo
                    catch 
                        { 
                             Write-Host "Cannot connect to $Computer" -BackgroundColor White -ForegroundColor Red 
-                            Break 
+                            #Break 
                        } 
                } 
            catch  
@@ -147,36 +147,78 @@ for ($i = $startaddr; $i -le $endaddr; $i++)
 }
 
 }
-#$user = Read-Host = "Enter Username "
+Function Select-FolderDialog
+{
+    param([string]$Description="Select Folder",[string]$RootFolder="Desktop")
+
+ [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") |
+     Out-Null     
+
+   $objForm = New-Object System.Windows.Forms.FolderBrowserDialog
+        $objForm.Rootfolder = $RootFolder
+        $objForm.Description = $Description
+        $Show = $objForm.ShowDialog()
+        If ($Show -eq "OK")
+        {
+            Return $objForm.SelectedPath
+        }
+        Else
+        {
+            Write-Error "Operation cancelled by user."
+        }
+    }
+
+<#$user = Read-Host = "Enter Username "
 #$pass = Read-Host = "Enter pass " 
 #Start-Process powershell.exe -Credential ""
+#>
+
+$script = Write-host "Select the Location of the shares.ps1 file" | Select-FolderDialog
+Set-Location -Path $script
+
+#$runProg = new-object system.management.automation.PSCredential $creds Invoke-Command -ComputerName "." -scriptblock {
 Write-host 'This will allow you to scan systems for open shares on the network either with a file or cidr notation' -BackgroundColor Black -ForegroundColor Green
 $main = Read-Host -Prompt 'Enter cidr or file: ' 
 #$network = Read-Host -Prompt 'Enter network address:' 
 #$cidr = Read-Host -Prompt "Enter CIDR : "
 #$shares = Read-Host -Prompt 'Enter Location of file with IPs or Hostnames '
 #$location = Read-Host -Prompt 'Enter Location you wan to save the output to '
-$location = Read-Host -Prompt 'Enter Location you want to save the output to ' 
 
-If ($main -eq 'file'){
-    $shares = Read-Host -Prompt 'Enter Location of file with IPs or Hostnames ' 
-    ForEach ($system in Get-Content $shares)
-    {
-    Get-ShareInfo $system | FT -AutoSize | out-file $location -Append -NoClobber 
-    }
-}
-If ($main -eq 'cidr'){
-    Write-Host 'You will be propmted to enter the network address and cidr notation seperately!!!!' -BackgroundColor White -ForegroundColor Red 
-    $network = Read-Host -Prompt 'Enter network host address'
-    $cidr = Read-Host -Prompt 'Enter CIDR' 
-    Get-IPrange -ip $network -cidr $cidr | Out-file ./hosts.txt -Append -NoClobber 
-        ForEach ($host1 in Get-Content -Path ./hosts.txt)
-        {
-        Get-ShareInfo $host1 | FT -AutoSize | out-file $location -Append -NoClobber
-        Write-Host 'cidr'
-        }
-    Remove-Item ./hosts.txt     
-    
-    
-}
+$location = Write-Host "Select a location to store the results!" -BackgroundColor White -ForegroundColor Red | Select-FolderDialog
+$filename = Read-Host "Enter filename for the results!" 
+
+	If ($main -eq 'file'){
+		$shares = Read-Host -Prompt 'Enter Location of file with IPs or Hostnames ' 
+		ForEach ($system in Get-Content $shares)
+		{
+		Get-ShareInfo $system | FT -AutoSize | out-file $location"\"$filename".txt" -Append -NoClobber 
+		}
+	}
+	If ($main -eq 'cidr'){
+		Write-Host 'You will be propmted to enter the network address and cidr notation seperately!!!!' -BackgroundColor White -ForegroundColor Red 
+		$network = Read-Host -Prompt 'Enter network host address'
+		$cidr = Read-Host -Prompt 'Enter CIDR Number without the "\"!' 
+		Get-IPrange -ip $network -cidr $cidr | Out-file ./hosts.txt -Append -NoClobber 
+			ForEach ($host1 in Get-Content -Path ./hosts.txt)
+			{
+				if ($alive = Test-Connection $host1.Trim() -Quiet -Count 1){
+				$host1 |Out-file ./alive.txt -Append -NoClobber
+				Write-Host "$host1 -UP" -BackgroundColor Green -ForegroundColor Black
+				}
+				Else{
+				write-host "$host1 -Down, Not Written to File!" -b red
+				}
+					
+			}
+			ForEach($host2 in Get-Content -Path ./alive.txt)
+					{
+					Get-ShareInfo $host2 | FT -AutoSize | out-file $location"\"$filename".txt" -Append -NoClobber
+					}
+								
+		Remove-Item ./hosts.txt 	
+	}
+Write-Host "Shares have been written to $location\$filename! Have Fun!" -BackgroundColor Black -ForegroundColor Green
+#} -Credential $runProg
+#Get-Content ./alive.txt | Measure-Object -Line 
+
 
