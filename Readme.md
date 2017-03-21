@@ -24,6 +24,6 @@ Usage C:> SMBShareScanner.ps1
    Using WMI to query the number of open connections to Shares on local or remote systems 
    Then adding this information to the basic win32_share info 
    
-Start-SMBShareScanner.ps1
+Start-SMBShareScanner.bat
 
-This is a simple PowerShell wrapper for a run as command for when you  share your script with someone who can't right click and choose runas ... Seriously, we had to do this for a 'Sys Admin'
+This is a simple batch script wrapper for a runas command for when you share your script with someone who can't right click and choose runas ... Seriously, we had to do this for a 'Sys Admin'

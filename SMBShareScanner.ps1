@@ -220,5 +220,3 @@ $filename = Read-Host "Enter filename for the results!"
 Write-Host "Shares have been written to $location\$filename! Have Fun!" -BackgroundColor Black -ForegroundColor Green
 #} -Credential $runProg
 #Get-Content ./alive.txt | Measure-Object -Line 
-
-
