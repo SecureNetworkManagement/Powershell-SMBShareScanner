@@ -1,6 +1,6 @@
 SMBShareScanner.ps1
 
-This PowerShell script will allow you to scan open shares based on a list you provide or a subnet you enter. It will process hostnames or IP addresses and attempt to connect to the shares on a machine using WMI to make the connection.
+This PowerShell script will allow you to scan open shares based on a list you provide or a subnet you enter. It will process hostnames or IP addresses and attempt to connect to the shares on a machine using WMI to make the connection. The latest version uses NetView instead of WMI to allow non-administrative users to get the same results.
 
 Usage C:> SMBShareScanner.ps1
 
