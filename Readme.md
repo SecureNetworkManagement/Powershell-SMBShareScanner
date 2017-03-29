@@ -1,6 +1,6 @@
 SMBShareScanner.ps1
 
-This powershell script will allow you to scan open shares based on a list you provide or a subnet you enter. It will process hostnames or IP addresses and attempt to connect to the shares on a machine using WMI to make the connection.
+This PowerShell script will allow you to scan open shares based on a list you provide or a subnet you enter. It will process hostnames or IP addresses and attempt to connect to the shares on a machine using WMI to make the connection. The latest version uses NetView instead of WMI to allow non-administrative users to get the same results.
 
 Usage C:> SMBShareScanner.ps1
 
@@ -23,3 +23,7 @@ Usage C:> SMBShareScanner.ps1
 .FUNCTIONALITY 
    Using WMI to query the number of open connections to Shares on local or remote systems 
    Then adding this information to the basic win32_share info 
+   
+Start-SMBShareScanner.bat
+
+This is a simple batch script wrapper for a runas command for when you share your script with someone who can't right click and choose runas ... Seriously, we had to do this for a 'Sys Admin'
